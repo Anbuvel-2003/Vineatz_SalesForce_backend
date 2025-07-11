@@ -1,0 +1,439 @@
+openapi: 3.0.0
+info:
+  title: "Project Management System"
+  description: "This is API for the backend"
+  termsOfService: "https://example.com/terms"
+  contact:
+    name: "API Support"
+    url: "https://example.com/terms"
+    email: "XNtBp@example.com"
+  license:
+    name: "Example license"
+    url: "https://www.apache.org/licenses.html"
+  version: 1.0
+  servers:
+    - url: "process.env.REACT_APP_BACKEND_URL"
+      description: "This is Local Server"
+  schemes: [http, https]
+  tags:
+    - name: "Project Management System"
+      description: "Project Management System API for the backend"
+
+paths:
+  "/api/projects":
+    get:
+      summary: "Get all projects"
+      description: "Get all projects"
+      tags:
+        - "Project Management System"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                 type: object
+                 properties:
+                  _id:
+                    type: number
+                    description: "The auto-generated id of the project"
+                  project_Manager:
+                    type: string
+                    description: "this is project_Manager name"
+                  project_description:
+                    type: number
+                    description: "this is project_description"
+                  project_status:
+                    type: string
+                    description: "this is project_status"
+                  start_Date:
+                    type: Date
+                    description: "start date of project"
+                  end_Date:
+                    type: Date
+                    description: "end date of project"
+                  createdAt:
+                    type: string
+                    description: "The date and time the project was created"
+                  updatedAt:
+                    type: string
+                    description: "The date and time the project  was updated"
+                  
+        '404':
+          description: "Not Found"
+          content: 
+           application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                example: 
+                  message: "No students found"
+
+  "/api/creteprojects": 
+    post:
+      summary: " Create a new Project"
+      description: ""
+      tags:
+        - "Project Management System" 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                type: array
+                items:  
+                 type: object
+                 properties:
+                  project_Name:
+                    type: string
+                    description: "this is project name"
+                  project_Manager:
+                    type: string
+                    description: "this is project_Manager name"
+                  project_description:
+                    type: number
+                    description: "this is project_description"
+                  project_status:
+                    type: string
+                    description: "this is project_status"
+                  start_Date:
+                    type: String
+                    format: date
+                    description: "start date of project"
+                  end_Date:
+                    type: String
+                    format: date
+                    description: "end date of project"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: " project created successfully"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "Internal Server Error"
+  "/api/projects/{id}": 
+    get:
+      summary: "Get a Project by id"
+      description: "Get a Project by id"
+      tags: 
+        - "Project Management System"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: "The Project id"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  post:
+                   $ref: "#/components/schemas/post"
+        '404':
+          description: "Not Found"
+          content: 
+           application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                example: 
+                  message: "No Project found"
+  '/api/updateprojects/{id}': 
+    put:
+      summary: "Update a student by id"
+      description: "Update a student by id"
+      tags:
+        - "Project Management System"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: "The Project id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+               post:
+                $ref: "#/components/schemas/post"
+      responses:
+        "200":
+          description: "Successful Response"
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "project updated successfully !!!!@@@@"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "No Project found with this id"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "Internal Server Error"
+  "/api/deleteprojects/{id}": 
+    delete:
+      summary: "Delete a Project by id"
+      description: "Delete a Project by id"
+      tags:
+        - "Project Management System"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: "The student id"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "project details deleted sucessfully !!!!@@@@"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "No Project found with this id"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "Internal Server Error"
+                    
+  "/api/CreateUser": 
+    post:
+      summary: "User Registration"
+      description: "this is user registration"
+      tags:
+        - "Usersection-Project Management System"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+                 type: object
+                 properties:
+                  firstname:
+                    type: string
+                    description: "this is firstname"
+                  lastname:
+                    type: string
+                    description: "this is lastname"
+                  email:
+                    type: string
+                    description: "this is email"
+                  phonenumber:
+                    type: number
+                    description: "this is phonenumber"
+                  password:
+                    type: string
+                    description: "this is password"
+                  address:
+                    type: string
+                    description: "this is address"
+                  gender:
+                    type: string
+                    description: "this is gender"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "User registered successfully"
+                    example: "User"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "No Project found with this id"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "Internal Server Error"                                         
+  "/api/loginUser": 
+    post:
+      summary: "User login"
+      description: "this is user login"
+      tags:
+        - "Usersection-Project Management System"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+                 type: object
+                 properties:
+                  email:
+                    type: string
+                    description: "this is email"
+                  password:
+                    type: string
+                    description: "this is password"
+
+
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "User Login successfully"
+                    example: "User"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "No Project found with this id"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "The message of the response"
+                    example: "Internal Server Error" 
+components:
+  schemas:
+    post:
+      type: object
+      properties:
+         project_Name:
+                    type: string
+                    description: "this is project name"
+         project_Manager:
+                    type: string
+                    description: "this is project_Manager name"
+         project_description:
+                    type: number
+                    description: "this is project_description"
+         project_status:
+                    type: string
+                    description: "this is project_status"
+         start_Date:
+                    type: Date
+                    description: "start date of project"
+         end_Date:
+                    type: Date
+                    description: "end date of project"
+         createdAt:
+                    type: string
+                    description: "The date and time the project was created"
+         updatedAt:
+                    type: string
+                    description: "The date and time the project  was updated"
+
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "The message of the response"
+          example: "Internal Server Error"
+
+    InvalidPost:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "The message of the response"
+          example: "Invalid Post"      

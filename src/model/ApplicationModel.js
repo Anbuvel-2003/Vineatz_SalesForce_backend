@@ -1,0 +1,22 @@
+import mongoose from "mongoose";
+const ApplicationSchema = new mongoose.Schema({
+    Application_Name: {
+        type: String,
+        required: true,
+    },
+    Application_Description: {
+        type: String,
+        required: true,
+    },
+    Application_url: {
+        type: String
+    },
+    Application_lunch_date: {
+        type: String
+    }
+}, {
+    timestamps: true,
+});
+
+const Application = mongoose.model("Application", ApplicationSchema);
+export default Application;
