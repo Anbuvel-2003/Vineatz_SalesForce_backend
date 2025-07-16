@@ -4,7 +4,22 @@ import bcrypt from "bcrypt";
 // CREATE USER
 const createUser = async (req, res) => {
   try {
-    const { Email, Mobile_Number, Password } = req.body;
+    const { first_Name, last_Name, Email, Mobile_Number, Password, Address } =
+      req.body;
+
+    if (
+      !first_Name ||
+      !last_Name ||
+      !Email ||
+      !Mobile_Number ||
+      !Password ||
+      !Address
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
 
     const existing = await Users.findOne({ Email });
     if (existing) {
@@ -12,6 +27,7 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Email already exists" });
     }
+
     const newUser = new Users(req.body);
     await newUser.save();
 
@@ -107,4 +123,51 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getAllUsers, getUserById, updateUser, deleteUser, createUser };
+const LoginUser = async (req, res) => {
+  const { Email, Password } = req.body;
+  try {
+    const userdata = await Users.findOne({ Email });
+    if (!Email) {
+      res.status(400).json({ message: "User Not Found", success: false });
+    } else {
+      console.log("user", userdata?.Password);
+
+      const isMatch = await bcrypt.compare(Password, userdata.Password);
+      if (!isMatch) {
+        return res
+          .status(400)
+          .json({ message: "Incorrect password", success: false });
+      }
+      res.status(200).json({
+        message: "Login Successfull",
+        data: {
+          first_Name: userdata.first_Name,
+          last_Name: userdata.last_Name,
+          Email: userdata.Email,
+          Mobile_Number: userdata.Mobile_Number,
+          Address: userdata.Address,
+          Password: userdata.Password,
+          _id: userdata._id,
+        },
+        success: true,
+      });
+    }
+  } catch (err) {
+    if (err.kind === "ObjectId" && err.name === "CastError") {
+      return res
+        .status(400)
+        .json({ message: "invalid post ID", success: false });
+    }
+    console.log(err?.message);
+    res.status(500).json({ message: err?.message, success: false });
+  }
+};
+
+export {
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  createUser,
+  LoginUser,
+};

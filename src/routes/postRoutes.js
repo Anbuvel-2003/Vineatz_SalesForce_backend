@@ -18,6 +18,7 @@ import {
   deleteUser,
   getAllUsers,
   getUserById,
+  LoginUser,
   updateUser,
 } from "../controllers/UserControllers.js";
 import {
@@ -52,6 +53,7 @@ router.post("/user", createUser);
 router.get("/user/:id", getUserById);
 router.put("/user/:id", updateUser);
 router.delete("/user/:id", deleteUser);
+router.post("/user/login", LoginUser);
 
 // REJECT :
 router.get("/reject", getAllRejects);
