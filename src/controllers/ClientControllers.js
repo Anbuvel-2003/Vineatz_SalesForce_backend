@@ -1,4 +1,4 @@
-import Clientmodel from "../model/ClientModel";
+import Clientmodel from "../model/ClientModel.js";
 
 // GET CLIENT:
 const getAllclient = async (req, res) => {
