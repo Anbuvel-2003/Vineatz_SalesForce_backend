@@ -2,7 +2,7 @@ import { application } from "express";
 import Employeemodel from "../model/EmployeeModel.js";
 
 // GET EMPLOYEE:
- const getAllEmployees = async (req, res) => {
+const getAllEmployees = async (req, res) => {
   try {
     const employees = await Employeemodel.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: employees });
@@ -25,6 +25,10 @@ const createEmployee = async (req, res) => {
     Employee_Address,
     Employee_Bike_Number,
     Employee_Driving_License_Number,
+    Employee_joining_date,
+    Application_Id,
+    Client_Id,
+    Lead_Id,
   } = req.body;
   try {
     const existingEmployee = await Employeemodel.findOne({ Employee_Id });
@@ -43,9 +47,13 @@ const createEmployee = async (req, res) => {
       Employee_Address,
       Employee_Bike_Number,
       Employee_Driving_License_Number,
+      Employee_joining_date,
+      Application_Id,
+      Client_Id,
+      Lead_Id,
     });
     res.status(200).json({
-      message: "Application Created Sucessfully !!!!",
+      message: "Employee Created Sucessfully !!!!",
       data: employee,
       success: true,
     });
@@ -56,7 +64,7 @@ const createEmployee = async (req, res) => {
 };
 
 // // GET SINGLE EMPLOYEE :
- const getEmployeeById = async (req, res) => {
+const getEmployeeById = async (req, res) => {
   const { id } = req.params;
   try {
     const employee = await Employeemodel.findById(id);
@@ -75,7 +83,7 @@ const createEmployee = async (req, res) => {
 };
 
 // // UPDATE  EMPLOYEE:
- const updateEmployee = async (req, res) => {
+const updateEmployee = async (req, res) => {
   const { id } = req.params;
 
   const {
@@ -87,6 +95,10 @@ const createEmployee = async (req, res) => {
     Employee_Address,
     Employee_Bike_Number,
     Employee_Driving_License_Number,
+    Employee_joining_date,
+    Application_Id,
+    Client_Id,
+    Lead_Id,
   } = req.body;
 
   try {
@@ -119,7 +131,11 @@ const createEmployee = async (req, res) => {
     employee.Employee_Driving_License_Number =
       Employee_Driving_License_Number ||
       employee.Employee_Driving_License_Number;
-
+    employee.Employee_joining_date =
+      Employee_joining_date || employee.Employee_joining_date;
+    employee.Lead_Id = Lead_Id || employee.Lead_Id;
+    employee.Application_Id = Application_Id || employee.Application_Id;
+    employee.Client_Id = Client_Id || employee.Client_Id;
     await employee.save();
 
     res.status(200).json({
@@ -136,7 +152,7 @@ const createEmployee = async (req, res) => {
 };
 
 // // DELETE EMPLOYEE :
- const deleteEmployee = async (req, res) => {
+const deleteEmployee = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -164,5 +180,5 @@ export {
   createEmployee,
   getEmployeeById,
   deleteEmployee,
-  updateEmployee
+  updateEmployee,
 };

@@ -1,59 +1,42 @@
 import mongoose from "mongoose";
-const leadsschema = new mongoose.Schema({
-    Application_Id: {
-        type: String,
+const leadsschema = new mongoose.Schema(
+  {
+    Lead_Status_ID: {
+      type: Number,
+      enum: [0, 1, 2, 3, 4, 5, 6, 7],
     },
-    Application_Name: {
-        type: String,
-    },
-    Client_name: {
-        type: String,
-    },
-    Client_Email: {
-        type: String,
-    },
-    Client_Mobilenumber: {
-        type: number,
-    },
-    Client_Company_Name: {
-        type: String,
-    },
-    Client_Address: {
-        type: String,
-    },
-    Client_Register_certificate_No: {
-        type: String,
-    },
-    Client_GST: {
-        type: String
-    },
-    Lead_Stage: {
-        type: Array
-    },
-    Lead_Stage_No: {
-        type: Number,
-        enum: [0, 1, 2, 3, 4, 5, 6],
+    Application_ID: {
+      type: String,
     },
     Employee_Id: {
-        type: String
+      type: String,
     },
-    reject_reason: {
-        type: String
+    Reject_ID: {
+      type: String,
     },
-    reject_subjects: {
-        type: String
+    First_Stage: {
+      type: Array,
     },
-    reject_date: {
-        type: Date
+    Second_Stage: {
+      type: Array,
     },
-    reject_stage_no: {
-        type: Number,
-        enum: [0, 1, 2, 3, 4, 5, 6]
-    }
-
-}, {
+    Third_Stage: {
+      type: Array,
+    },
+    Fourth_Stage: {
+      type: Array,
+    },  
+    Fivth_Stage: {
+      type: Array,
+    },
+    Sixth_Stage: {
+      type: Array,
+    },
+  },
+  {
     timestamps: true,
-});
+  }
+);
 
 const leads = mongoose.model("leads", leadsschema);
 export default leads;

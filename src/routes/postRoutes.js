@@ -28,6 +28,13 @@ import {
   getRejectById,
   updateReject,
 } from "../controllers/RejectControllers.js";
+import {
+  createclient,
+  deleteClient,
+  getAllclient,
+  getClientById,
+  updateClient,
+} from "../controllers/ClientControllers.js";
 const router = express.Router();
 
 // APPLICATION :
@@ -38,7 +45,6 @@ router.put("/application/:id", updateapplication);
 router.delete("/application/:id", deleteapplication);
 
 // EMPLOYEE :
-
 router.get("/employee", getAllEmployees);
 router.post("/employee", createEmployee);
 router.get("/employee/:id", getEmployeeById);
@@ -61,4 +67,11 @@ router.post("/reject", createReject);
 router.get("/reject/:id", getRejectById);
 router.put("/reject/:id", updateReject);
 router.delete("/reject/:id", deleteReject);
+
+// CLIENT :
+router.get("/client", getAllclient);
+router.get("/client", createclient);
+router.get("/client/:id", getClientById);
+router.get("/client/:id", updateClient);
+router.get("/client/:id", deleteClient);
 export default router;

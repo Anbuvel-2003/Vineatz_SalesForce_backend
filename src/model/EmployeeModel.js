@@ -7,12 +7,10 @@ const EmployeeSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
-
     Employee_Name: {
       type: String,
       required: true,
     },
-
     Employee_Email: {
       type: String,
       required: true,
@@ -21,24 +19,32 @@ const EmployeeSchema = new mongoose.Schema(
         "Please enter a valid email address",
       ],
     },
-
     Employee_Mobilenumber: {
       type: String,
       required: true,
       match: [/^\d{10}$/, "Mobile number must be 10 digits"],
     },
-
     Employee_Alternative_Mobilenumber: {
       type: String,
       required: true,
       match: [/^\d{10}$/, "Alternative mobile number must be 10 digits"],
     },
-
     Employee_Address: {
       type: String,
       required: true,
     },
-
+    Employee_joining_date: {
+      type: Date,
+    },
+    Lead_Id: {
+      type: String,
+    },
+    Application_Id: {
+      type: String,
+    },
+    Client_Id: {
+      type: String,
+    },
     Employee_Bike_Number: {
       type: String,
       required: true,
@@ -47,7 +53,6 @@ const EmployeeSchema = new mongoose.Schema(
         "Please enter a valid bike number (e.g., TN01AB1234)",
       ],
     },
-
     Employee_Driving_License_Number: {
       type: String,
       required: true,
