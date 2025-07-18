@@ -1,5 +1,7 @@
+import Welcomemail from "../emailtemplates/welcomemail.js";
 import Users from "../model/UserModel.js"; // your UserSchema file
 import bcrypt from "bcrypt";
+import { sendMail } from "../Utils/EmailServer/emailsend.js";
 
 // CREATE USER
 const createUser = async (req, res) => {
@@ -30,12 +32,27 @@ const createUser = async (req, res) => {
 
     const newUser = new Users(req.body);
     await newUser.save();
+    const html = Welcomemail(Email, Password);
+    const subject = `👋 Welcome to Vineatz Salesforce, ${first_Name}!`;
 
-    res.status(201).json({
-      success: true,
-      message: "User created successfully",
-      data: newUser,
-    });
+    const result = await sendMail({ to: Email, subject, html });
+    result.success
+      ? console.log("Email sent successfully")
+      : console.error("Failed to send email:", result.error);
+    if (result.success) {
+      return res.status(201).json({
+        success: true,
+        message: "User created successfully",
+        data: newUser,
+      });
+    } else {
+      console.error("Failed to send email:", result.error);
+      // Optionally delete the user or mark email failed
+      return res.status(500).json({
+        success: false,
+        message: "User created, but failed to send welcome email",
+      });
+    }
   } catch (error) {
     console.error("Create User Error:", error.message);
     res.status(500).json({ success: false, message: "Server error" });
