@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const EmployeeSchema = new mongoose.Schema(
   {
@@ -61,11 +62,40 @@ const EmployeeSchema = new mongoose.Schema(
         "Please enter a valid license number (e.g., TN1020201234567)",
       ],
     },
+    Employee_Password: {
+      type: String,
+      required: true,
+      minlength: [8, "Password must be at least 8 characters"],
+      validate: {
+        validator: function (value) {
+          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(value);
+        },
+        message:
+          "Password must include uppercase, lowercase, number, and special character",
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// 🔐 Hash password before saving
+EmployeeSchema.pre("save", async function (next) {
+  if (!this.isModified("Employee_Password")) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.Employee_Password = await bcrypt.hash(this.Employee_Password, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 🔑 Add method to compare password
+EmployeeSchema.methods.comparePassword = async function (plainPassword) {
+  return await bcrypt.compare(plainPassword, this.Employee_Password);
+};
 
 const Employeemodel = mongoose.model("Employee", EmployeeSchema);
 export default Employeemodel;

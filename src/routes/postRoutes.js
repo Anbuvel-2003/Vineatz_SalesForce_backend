@@ -35,6 +35,7 @@ import {
   getClientById,
   updateClient,
 } from "../controllers/ClientControllers.js";
+import { getAllnotifications } from "../controllers/NotificationControllers.js";
 const router = express.Router();
 
 // APPLICATION :
@@ -70,8 +71,11 @@ router.delete("/reject/:id", deleteReject);
 
 // CLIENT :
 router.get("/client", getAllclient);
-router.get("/client", createclient);
+router.post("/client", createclient);
 router.get("/client/:id", getClientById);
 router.get("/client/:id", updateClient);
 router.get("/client/:id", deleteClient);
+
+// Notification :
+router.get("/notification", getAllnotifications);
 export default router;

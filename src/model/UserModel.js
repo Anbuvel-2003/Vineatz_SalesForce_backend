@@ -7,18 +7,15 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     last_Name: {
       type: String,
       required: true,
     },
-
     Mobile_Number: {
       type: String,
       required: true,
       match: [/^\d{10}$/, "Mobile number must be exactly 10 digits"],
     },
-
     Email: {
       type: String,
       required: true,
@@ -32,7 +29,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    IsAdmin: {
+      type: Boolean,
+      default: false,
+    },
     Password: {
       type: String,
       required: true,

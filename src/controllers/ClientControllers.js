@@ -1,4 +1,6 @@
+import Applicationmodel from "../model/ApplicationModel.js";
 import Clientmodel from "../model/ClientModel.js";
+import Notificationmodel from "../model/Notificationmodel.js";
 
 // GET CLIENT:
 const getAllclient = async (req, res) => {
@@ -38,13 +40,29 @@ const createclient = async (req, res) => {
       Application_ID,
       Lead_ID,
     });
+    const application = await Applicationmodel.findById(Application_ID);
+    if (!application) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Application not found" });
+    }
+    console.log("application", application);
+    console.log("application", application?.Application_Name);
+
+    await Notificationmodel.create({
+      Client_Id: client._id?.toString(),
+      Application_Id: Application_ID,
+      Application_Name: application?.Application_Name,
+      is_read: false,
+      message: `The lead has been received for ${application?.Application_Name}, please check and process it`,
+    });
+
     res.status(200).json({
       message: "Client Created Sucessfully !!!!",
       data: client,
       success: true,
     });
-  } catch (err) {
-    console.log(err?.message);
+  } catch (err) { console.log(err?.message);
     res.status(400).json({ message: err?.message, success: false });
   }
 };

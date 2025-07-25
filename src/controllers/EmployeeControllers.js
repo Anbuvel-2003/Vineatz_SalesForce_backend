@@ -1,11 +1,39 @@
 import { application } from "express";
 import Employeemodel from "../model/EmployeeModel.js";
+import Welcomemail from "../emailtemplates/welcomemail.js";
+import { sendMail } from "../Utils/EmailServer/emailsend.js";
 
 // GET EMPLOYEE:
 const getAllEmployees = async (req, res) => {
   try {
-    const employees = await Employeemodel.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: employees });
+    // Get query params or default to page 1 and limit 10
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Calculate how many records to skip
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination metadata
+    const total = await Employeemodel.countDocuments();
+
+    // Fetch paginated data
+    const employees = await Employeemodel.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      data: employees,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+    });
   } catch (error) {
     console.error("Get All Employees Error:", error.message);
     res
@@ -16,46 +44,89 @@ const getAllEmployees = async (req, res) => {
 
 // CREATE EMPLOYEE :
 const createEmployee = async (req, res) => {
-  const {
-    Employee_Id,
-    Employee_Name,
-    Employee_Email,
-    Employee_Mobilenumber,
-    Employee_Alternative_Mobilenumber,
-    Employee_Address,
-    Employee_Bike_Number,
-    Employee_Driving_License_Number,
-    Employee_joining_date,
-    Application_Id,
-    Client_Id,
-    Lead_Id,
-  } = req.body;
   try {
-    const existingEmployee = await Employeemodel.findOne({ Employee_Id });
-    if (existingEmployee) {
+    const {
+      Employee_Name,
+      Employee_Email,
+      Employee_Mobilenumber,
+      Employee_Alternative_Mobilenumber,
+      Employee_Address,
+      Employee_joining_date,
+      Lead_Id,
+      Application_Id,
+      Client_Id,
+      Employee_Bike_Number,
+      Employee_Driving_License_Number,
+      Employee_Password,
+    } = req.body;
+    // ✅ Validate required fields
+    if (
+      !Employee_Name ||
+      !Employee_Email ||
+      !Employee_Mobilenumber ||
+      !Employee_Alternative_Mobilenumber ||
+      !Employee_Address ||
+      !Employee_Bike_Number ||
+      !Employee_Driving_License_Number ||
+      !Employee_Password
+    ) {
       return res.status(400).json({
-        message: "Employee ID already exists!",
         success: false,
+        message: "All required fields must be filled",
       });
     }
-    const employee = await Employeemodel.create({
+    // ✅ Check if email already exists
+    const existingEmployee = await Employeemodel.findOne({
+      Employee_Email,
+    });
+    if (existingEmployee) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+    // ✅ Generate auto Employee_Id like EMP001
+    const lastEmployee = await Employeemodel.findOne().sort({ createdAt: -1 });
+    let nextId = 1;
+    if (lastEmployee && lastEmployee.Employee_Id) {
+      const lastIdNum = parseInt(
+        lastEmployee.Employee_Id.replace("EMP", "")
+      );
+      nextId = lastIdNum + 1;
+    }
+    const Employee_Id = `EMP${nextId.toString().padStart(3, "0")}`;
+    // ✅ Create and save new employee
+    const newEmployee = new Employeemodel({
       Employee_Id,
       Employee_Name,
       Employee_Email,
       Employee_Mobilenumber,
       Employee_Alternative_Mobilenumber,
       Employee_Address,
-      Employee_Bike_Number,
-      Employee_Driving_License_Number,
       Employee_joining_date,
+      Lead_Id,
       Application_Id,
       Client_Id,
-      Lead_Id,
+      Employee_Bike_Number,
+      Employee_Driving_License_Number,
+      Employee_Password,
     });
-    res.status(200).json({
-      message: "Employee Created Sucessfully !!!!",
-      data: employee,
+    await newEmployee.save();
+    // ✅ Send welcome email with credentials
+    const subject = `👋 Welcome to Vineatz Salesforce, ${Employee_Name}!`;
+    const html = Welcomemail(Employee_Email, Employee_Password); // This sends raw password
+    const result = await sendMail({ to: Employee_Email, subject, html });
+    if (!result.success) {
+      console.error("Email sending failed:", result.error);
+      return res.status(500).json({
+        success: false,
+        message: "Employee created, but failed to send email",
+      });
+    }
+    res.status(201).json({
       success: true,
+      message: "Employee created successfully",
+      data: newEmployee,
     });
   } catch (err) {
     console.log(err?.message);
@@ -182,3 +253,4 @@ export {
   deleteEmployee,
   updateEmployee,
 };
+    
