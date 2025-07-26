@@ -20,5 +20,5 @@ function Welcomemail(email, password) {
     </div>
   `;
 }
-  
+
 export default Welcomemail;

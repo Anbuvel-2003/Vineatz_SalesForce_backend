@@ -14,12 +14,15 @@ import {
   updateEmployee,
 } from "../controllers/EmployeeControllers.js";
 import {
+  Changepassword,
   createUser,
   deleteUser,
   getAllUsers,
   getUserById,
   LoginUser,
+  SendOtp,
   updateUser,
+  VerifyOtp,
 } from "../controllers/UserControllers.js";
 import {
   createReject,
@@ -61,6 +64,9 @@ router.get("/user/:id", getUserById);
 router.put("/user/:id", updateUser);
 router.delete("/user/:id", deleteUser);
 router.post("/user/login", LoginUser);
+router.post("/user/sendotp", SendOtp);
+router.post("/user/verifyotp", VerifyOtp);
+router.post("/user/changepassword", Changepassword);
 
 // REJECT :
 router.get("/reject", getAllRejects);
