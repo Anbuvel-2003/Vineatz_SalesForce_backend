@@ -39,7 +39,7 @@ const createUser = async (req, res) => {
     const lastUser = await Users.findOne().sort({ createdAt: -1 });
     let nextId = 1;
     if (lastUser && lastUser.User_Id) {
-      const lastIdNum = parseInt(lastUser.User_Id.replace("EMP", ""));
+      const lastIdNum = parseInt(lastUser.User_Id.replace("AMD", ""));
       nextId = lastIdNum + 1;
     }
     const User_Id = `AMD${nextId.toString().padStart(3, "0")}`;
@@ -95,7 +95,7 @@ const getAllUsers = async (req, res) => {
 
     // Fetch paginated data
     const users = await Users.find()
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .skip(skip)
       .limit(limit);
 
@@ -139,7 +139,6 @@ const updateUser = async (req, res) => {
     const { id } = req.params;
 
     if (req.body.Password) {
-      // Hash new password if provided
       const salt = await bcrypt.genSalt(10);
       req.body.Password = await bcrypt.hash(req.body.Password, salt);
     }
@@ -165,7 +164,7 @@ const updateUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Error updating user" });
   }
 };
-
+  
 // DELETE USER
 const deleteUser = async (req, res) => {
   try {
