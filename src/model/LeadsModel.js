@@ -1,36 +1,83 @@
 import mongoose from "mongoose";
-const leadsschema = new mongoose.Schema(
+
+const leadSchema = new mongoose.Schema(
   {
-    Lead_Status_ID: {
+    Id: {
+      type: String,
+      unique: true,
+      required: [true, "Id is required"],
+      trim: true,
+    },
+    Name: {
+      type: String,
+      required: [true, "Name is required"],
+      trim: true,
+      minlength: [2, "Name must be at least 2 characters"],
+    },
+    Email: {
+      type: String,
+      required: [true, "Email is required"],
+      trim: true,
+      lowercase: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email address",
+      ],
+    },
+    Mobilenumber: {
+      type: String,
+      required: [true, "Mobile number is required"],
+      match: [/^\d{10}$/, "Mobile number must be exactly 10 digits"],
+    },
+    Address: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Address can't exceed 300 characters"],
+    },
+    Company_Name: {
+      type: String,
+      trim: true,
+    },
+    GST: {
+      type: String,
+      trim: true,
+      match: [/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Invalid GST format"],
+    },
+    Register_Certificate_Number: {
+      type: String,
+      trim: true,
+    },
+    Status: {
       type: Number,
-      enum: [0, 1, 2, 3, 4, 5, 6, 7],
+      required: [true, "Status is required"],
+      enum: {
+        values: [0, 1, 2, 3, 4, 5, 6],
+        message: "Status must be between 0 and 6",
+      },
     },
-    Application_ID: {
+    details: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+    },
+    Application_Id: {
       type: String,
+      trim: true,
     },
-    Employee_Id: {
+    Application_Name: {
       type: String,
+      trim: true,
     },
-    Reject_ID: {
-      type: String,
+    Joining_Date: {
+      type: Date,
     },
-    First_Stage: {
-      type: Array,
-    },
-    Second_Stage: {
-      type: Array,
-    },
-    Third_Stage: {
-      type: Array,
-    },
-    Fourth_Stage: {
-      type: Array,
-    },  
-    Fivth_Stage: {
-      type: Array,
-    },
-    Sixth_Stage: {
-      type: Array,
+    Notes: {
+      type: [
+        {
+          note: String,
+          createdAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
     },
   },
   {
@@ -38,5 +85,5 @@ const leadsschema = new mongoose.Schema(
   }
 );
 
-const leads = mongoose.model("leads", leadsschema);
-export default leads;
+const Lead = mongoose.model("Lead", leadSchema);
+export default Lead;

@@ -39,6 +39,7 @@ import {
   updateClient,
 } from "../controllers/ClientControllers.js";
 import { getAllnotifications } from "../controllers/NotificationControllers.js";
+import { createLead, getAllLeads, getSingleLead } from "../controllers/LeadControllers.js";
 const router = express.Router();
 
 // APPLICATION :
@@ -84,4 +85,13 @@ router.get("/client/:id", deleteClient);
 
 // Notification :
 router.get("/notification", getAllnotifications);
+
+
+
+
+// Leads :
+router.get("/lead", getAllLeads);
+router.post("/lead", createLead);
+router.post("/lead/:id", getSingleLead);
+
 export default router;
