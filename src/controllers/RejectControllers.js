@@ -1,4 +1,4 @@
-import Rejectmodel from "../model/rejectmodel.js";
+import Rejectmodel from "../model/Rejectmodel.js";
 import mongoose from "mongoose";
 
 // CREATE
