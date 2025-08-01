@@ -10,7 +10,7 @@ const yamlfile = './src/api.yaml';
 const swaggerJSDoc = Yaml.load(yamlfile);
 dotenv.config();
 connectDB();
-const PORT = process.env.PORT || 5003;
+const PORT = process.env.PORT || 5001;
 const app = express();
 // middleware 
 app.use(cors());

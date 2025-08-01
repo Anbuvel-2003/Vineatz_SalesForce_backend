@@ -41,7 +41,10 @@ const leadSchema = new mongoose.Schema(
     GST: {
       type: String,
       trim: true,
-      match: [/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Invalid GST format"],
+      match: [
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+        "Invalid GST format",
+      ],
     },
     Register_Certificate_Number: {
       type: String,
@@ -73,6 +76,8 @@ const leadSchema = new mongoose.Schema(
     Notes: {
       type: [
         {
+          _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+          subject: String,
           note: String,
           createdAt: { type: Date, default: Date.now },
         },

@@ -75,26 +75,21 @@ const getAllLeads = async (req, res) => {
         { Application_Name: searchRegex },
       ];
     }
-
     // 🎯 Multi-status filtering (comma-separated values like 1,2,3)
     if (status) {
       const statusArray = status.split(",").map((s) => parseInt(s));
       query.Status = { $in: statusArray };
     }
-
     // 📊 Total leads matching filters
     const total = await Lead.countDocuments(query);
     const totalPages = Math.ceil(total / parsedLimit);
-
     // 🧲 Sort configuration
     const sortOrder = order === "asc" ? 1 : -1;
-
     // 📥 Paginated, sorted, filtered leads
     const leads = await Lead.find(query)
       .sort({ [sortBy]: sortOrder })
       .skip((page - 1) * parseInt(limit))
       .limit(parseInt(limit));
-
     res.status(200).json({
       success: true,
       total,
@@ -115,7 +110,6 @@ const getAllLeads = async (req, res) => {
 const getSingleLead = async (req, res) => {
   try {
     const { id } = req.params;
-
     const lead = await Lead.findById(id);
     if (!lead) {
       return res.status(404).json({
@@ -123,7 +117,6 @@ const getSingleLead = async (req, res) => {
         message: "Lead not found",
       });
     }
-
     res.status(200).json({
       success: true,
       data: lead,
@@ -136,4 +129,179 @@ const getSingleLead = async (req, res) => {
     });
   }
 };
-export { createLead, getAllLeads, getSingleLead };
+
+const updateLeadStatus = async (req, res) => {
+  try {
+    const {
+      status,
+      employeeid,
+      employeename,
+      employeeaddress,
+      expectedAmt,
+      expectedDate,
+      typeOfBusiness,
+      confidenceLevel,
+      applicationDemo,
+      featureExplanation,
+      paymentType,
+      finalAmount,
+      finalDate,
+    } = req.body;
+
+    const leadId = req.params.leadId;
+    const lead = await Lead.findById(leadId);
+    if (!lead) return res.status(404).json({ message: "Lead not found" });
+    if (!lead.data) {
+      lead.data = {};
+    }
+    lead.data.status = status;
+    let detail = { stage: status, updatedAt: new Date() };
+    switch (status) {
+      case 1:
+        detail = {
+          ...detail,
+          employeeId: employeeid,
+          employeeName: employeename,
+          employeeAddress: employeeaddress,
+        };
+        break;
+      case 2:
+        detail = {
+          ...detail,
+          expectedAmount: expectedAmt,
+          expectedDate,
+          typeOfBusiness,
+          confidenceLevel,
+        };
+        break;
+      case 3:
+        detail = {
+          ...detail,
+          applicationDemo: applicationDemo || false,
+          featureExplanation: featureExplanation || false,
+        };
+        break;
+      case 4:
+        detail = {
+          ...detail,
+          finalAmount,
+          finalDate,
+        };
+        break;
+      case 5:
+        detail = {
+          ...detail,
+          paymentType,
+        };
+        break;
+    }
+    const existingIndex = lead.details.findIndex(
+      (item) => item.stage == status
+    );
+    console.log("existingIndex", existingIndex);
+    if (existingIndex === -1) {
+      lead.details.push(detail);
+      lead.data.status = status;
+    } else {
+      lead.details[existingIndex] = {
+        ...lead.details[existingIndex],
+        ...detail,
+      };
+    }
+    await lead.save();
+    res.status(200).json({
+      success: true,
+      message: "Status updated successfully",
+      data: lead,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to update status",
+      error: err.message,
+    });
+  }
+};
+
+const addNote = async (req, res) => {
+  try {
+    const { note, subject } = req.body;
+    const updatedLead = await Lead.findByIdAndUpdate(
+      req.params.leadId,
+      {
+        $push: {
+          Notes: {
+            subject,
+            note,
+            createdAt: new Date(),
+          },
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json({
+      success: true,
+      message: "Note added successfully",
+      data: updatedLead,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add note", error: err.message });
+  }
+};
+
+const deleteNote = async (req, res) => {
+  try {
+    const { leadId, noteId } = req.params;
+    const updatedLead = await Lead.findByIdAndUpdate(
+      leadId,
+      {
+        $pull: { Notes: { _id: noteId } },
+      },
+      { new: true }
+    );
+    res.status(200).json({
+      success: true,
+      message: "Note deleted successfully",
+      data: updatedLead,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to delete note", error: err.message });
+  }
+};
+
+const updateNote = async (req, res) => {
+  try {
+    const { leadId, noteId } = req.params;
+    const { note, subject } = req.body;
+    const lead = await Lead.findOneAndUpdate(
+      { _id: leadId, "Notes._id": noteId },
+      {
+        $set: {
+          "Notes.$.note": note,
+          "Notes.$.subject": subject,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json({
+      success: true,
+      message: "Note updated successfully",
+      data: lead,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to update note", error: err.message });
+  }
+};
+
+export {
+  createLead,
+  getAllLeads,
+  getSingleLead,
+  updateLeadStatus,
+  addNote,
+  deleteNote,
+  updateNote,
+};
