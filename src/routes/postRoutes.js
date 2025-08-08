@@ -44,7 +44,9 @@ import {
   createLead,
   deleteNote,
   getAllLeads,
+  getAllRejectedLeads,
   getSingleLead,
+  rejectmessage,
   updateLeadStatus,
   updateNote,
 } from "../controllers/LeadControllers.js";
@@ -102,6 +104,7 @@ router.post("/lead/:leadId/notes", addNote);
 router.delete("/lead/:leadId/notes/:noteId", deleteNote);
 router.put("/lead/:leadId/notes/:noteId", updateNote);
 router.put("/lead/:leadId", updateLeadStatus);
-
+router.put("/lead/reject/:leadId", rejectmessage);
+router.get("/lead/reject", getAllRejectedLeads);
 
 export default router;

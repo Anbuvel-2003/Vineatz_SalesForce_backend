@@ -155,7 +155,7 @@ const updateLeadStatus = async (req, res) => {
     if (!lead.data) {
       lead.data = {};
     }
-    lead.data.status = status;
+    // lead.data.Status = status;
     let detail = { stage: status, updatedAt: new Date() };
     switch (status) {
       case 1:
@@ -201,8 +201,8 @@ const updateLeadStatus = async (req, res) => {
     );
     console.log("existingIndex", existingIndex);
     if (existingIndex === -1) {
+      lead.Status = status;
       lead.details.push(detail);
-      lead.data.status = status;
     } else {
       lead.details[existingIndex] = {
         ...lead.details[existingIndex],
@@ -297,6 +297,91 @@ const updateNote = async (req, res) => {
   }
 };
 
+const rejectmessage = async (req, res) => {
+  try {
+    const { leadId } = req.params;
+    const { subject, reason } = req.body;
+    if (!leadId || !subject || !reason) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const updatedLead = await Lead.findByIdAndUpdate(
+      leadId,
+      {
+        Is_rejected: true,
+        reject_subject: subject,
+        reject_reason: reason,
+      },
+      { new: true }
+    );
+    if (!updatedLead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+    return res.status(200).json({
+      message: "Lead rejection info updated successfully",
+      lead: updatedLead,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error updating reject message:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getAllRejectedLeads = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      sortBy = "Id",
+      order = "asc",
+    } = req.query;
+
+    const parsedLimit = parseInt(limit);
+    const sortOrder = order === "asc" ? 1 : -1;
+
+    const query = {
+      Is_rejected: true,
+    };
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { Id: searchRegex },
+        { Name: searchRegex },
+        { Email: searchRegex },
+        { Mobilenumber: searchRegex },
+        { Company_Name: searchRegex },
+        { Application_Id: searchRegex },
+        { Application_Name: searchRegex },
+      ];
+    }
+
+    const total = await Lead.countDocuments(query);
+    const totalPages = Math.ceil(total / parsedLimit);
+
+    const leads = await Lead.find(query)
+      .sort({ [sortBy]: sortOrder })
+      .skip((page - 1) * parsedLimit)
+      .limit(parsedLimit);
+
+    return res.status(200).json({
+      success: true,
+      total,
+      totalPages,
+      page: parseInt(page),
+      limit: parsedLimit,
+      data: leads,
+    });
+  } catch (error) {
+    console.error("Error fetching rejected leads:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
 export {
   createLead,
   getAllLeads,
@@ -305,4 +390,6 @@ export {
   addNote,
   deleteNote,
   updateNote,
+  rejectmessage,
+  getAllRejectedLeads
 };

@@ -5,18 +5,15 @@ const leadSchema = new mongoose.Schema(
     Id: {
       type: String,
       unique: true,
-      required: [true, "Id is required"],
       trim: true,
     },
     Name: {
       type: String,
-      required: [true, "Name is required"],
       trim: true,
       minlength: [2, "Name must be at least 2 characters"],
     },
     Email: {
       type: String,
-      required: [true, "Email is required"],
       trim: true,
       lowercase: true,
       match: [
@@ -26,7 +23,6 @@ const leadSchema = new mongoose.Schema(
     },
     Mobilenumber: {
       type: String,
-      required: [true, "Mobile number is required"],
       match: [/^\d{10}$/, "Mobile number must be exactly 10 digits"],
     },
     Address: {
@@ -52,7 +48,6 @@ const leadSchema = new mongoose.Schema(
     },
     Status: {
       type: Number,
-      required: [true, "Status is required"],
       enum: {
         values: [0, 1, 2, 3, 4, 5, 6],
         message: "Status must be between 0 and 6",
@@ -72,6 +67,16 @@ const leadSchema = new mongoose.Schema(
     },
     Joining_Date: {
       type: Date,
+    },
+    Is_rejected: {
+      type: Boolean,
+      default: false,
+    },
+    reject_subject: {
+      type: String,
+    },
+    reject_reason: {
+      type: String,
     },
     Notes: {
       type: [
