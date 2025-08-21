@@ -6,22 +6,14 @@ import { sendMail } from "../Utils/EmailServer/emailsend.js";
 // GET EMPLOYEE:
 const getAllEmployees = async (req, res) => {
   try {
-    // Get query params or default to page 1 and limit 10
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-
-    // Calculate how many records to skip
     const skip = (page - 1) * limit;
-
-    // Get total count for pagination metadata
     const total = await Employeemodel.countDocuments();
-
-    // Fetch paginated data
     const employees = await Employeemodel.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-
     res.status(200).json({
       success: true,
       data: employees,
@@ -156,7 +148,6 @@ const getEmployeeById = async (req, res) => {
 // // UPDATE  EMPLOYEE:
 const updateEmployee = async (req, res) => {
   const { id } = req.params;
-
   const {
     Employee_Id,
     Employee_Name,

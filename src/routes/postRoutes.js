@@ -50,6 +50,8 @@ import {
   updateLeadStatus,
   updateNote,
 } from "../controllers/LeadControllers.js";
+import { createTeamlead, deleteTeamlead, getAllTeamlead, getTeamleadById, updateTeamlead } from "../controllers/TeamleadController.js";
+import { createTeam, deleteTeam, getAllTeam, getTeamById, updateTeam } from "../controllers/TeamController.js";
 const router = express.Router();
 
 // APPLICATION :
@@ -92,6 +94,20 @@ router.post("/client", createclient);
 router.get("/client/:id", getClientById);
 router.get("/client/:id", updateClient);
 router.get("/client/:id", deleteClient);
+
+// TEAMLEAD :
+router.get("/teamlead", getAllTeamlead);
+router.post("/teamlead", createTeamlead);
+router.get("/teamlead/:id", getTeamleadById);
+router.get("/teamlead/:id", deleteTeamlead);
+router.get("/teamlead/:id", updateTeamlead);
+
+// TEAM :
+router.get("/team", getAllTeam);
+router.post("/team", createTeam);
+router.get("/team/:id", getTeamById);
+router.get("/team/:id", deleteTeam);
+router.get("/team/:id", updateTeam);
 
 // Notification :
 router.get("/notification", getAllnotifications);
