@@ -2,17 +2,17 @@ import mongoose from "mongoose";
 
 const leadSchema = new mongoose.Schema(
   {
-    Id: {
+    id: {
       type: String,
       unique: true,
       trim: true,
     },
-    Name: {
+    name: {
       type: String,
       trim: true,
       minlength: [2, "Name must be at least 2 characters"],
     },
-    Email: {
+    email: {
       type: String,
       trim: true,
       lowercase: true,
@@ -21,16 +21,16 @@ const leadSchema = new mongoose.Schema(
         "Please enter a valid email address",
       ],
     },
-    Mobilenumber: {
+    mobilenumber: {
       type: String,
       match: [/^\d{10}$/, "Mobile number must be exactly 10 digits"],
     },
-    Address: {
+    address: {
       type: String,
       trim: true,
       maxlength: [300, "Address can't exceed 300 characters"],
     },
-    Company_Name: {
+    company_name: {
       type: String,
       trim: true,
     },
@@ -42,33 +42,41 @@ const leadSchema = new mongoose.Schema(
         "Invalid GST format",
       ],
     },
-    Register_Certificate_Number: {
+    register_certificate_number: {
       type: String,
       trim: true,
     },
-    Status: {
+    status: {
       type: Number,
       enum: {
         values: [0, 1, 2, 3, 4, 5, 6],
         message: "Status must be between 0 and 6",
       },
     },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+    },
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+    },
     details: {
       type: [mongoose.Schema.Types.Mixed],
       default: [],
     },
-    Application_Id: {
+    application_id: {
       type: String,
       trim: true,
     },
-    Application_Name: {
+    application_name: {
       type: String,
       trim: true,
     },
-    Joining_Date: {
+    joining_date: {
       type: Date,
     },
-    Is_rejected: {
+    is_rejected: {
       type: Boolean,
       default: false,
     },
@@ -78,7 +86,11 @@ const leadSchema = new mongoose.Schema(
     reject_reason: {
       type: String,
     },
-    Notes: {
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
+    notes: {
       type: [
         {
           _id: { type: mongoose.Schema.Types.ObjectId, auto: true },

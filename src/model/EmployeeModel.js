@@ -3,16 +3,16 @@ import bcrypt from "bcrypt";
 
 const EmployeeSchema = new mongoose.Schema(
   {
-    Employee_Id: {
+    id: {
       type: String,
       unique: true,
       required: true,
     },
-    Employee_Name: {
+    name: {
       type: String,
       required: true,
     },
-    Employee_Email: {
+    email: {
       type: String,
       required: true,
       match: [
@@ -20,33 +20,30 @@ const EmployeeSchema = new mongoose.Schema(
         "Please enter a valid email address",
       ],
     },
-    Employee_Mobilenumber: {
+    mobilenumber: {
       type: String,
       required: true,
       match: [/^\d{10}$/, "Mobile number must be 10 digits"],
     },
-    Employee_Alternative_Mobilenumber: {
+    alternative_mobilenumber: {
       type: String,
       required: true,
       match: [/^\d{10}$/, "Alternative mobile number must be 10 digits"],
     },
-    Employee_Address: {
+    address: {
       type: String,
       required: true,
     },
-    Employee_joining_date: {
+    joining_date: {
       type: Date,
     },
-    Lead_Id: {
+    lead_id: {
       type: String,
     },
-    Application_Id: {
+    client_id: {
       type: String,
     },
-    Client_Id: {
-      type: String,
-    },
-    Employee_Bike_Number: {
+    Bike_Number: {
       type: String,
       required: true,
       match: [
@@ -54,7 +51,7 @@ const EmployeeSchema = new mongoose.Schema(
         "Please enter a valid bike number (e.g., TN01AB1234)",
       ],
     },
-    Employee_Driving_License_Number: {
+    driving_license_number: {
       type: String,
       required: true,
       match: [
@@ -62,7 +59,7 @@ const EmployeeSchema = new mongoose.Schema(
         "Please enter a valid license number (e.g., TN1020201234567)",
       ],
     },
-    Employee_Password: {
+    password: {
       type: String,
       required: true,
       minlength: [8, "Password must be at least 8 characters"],
@@ -74,6 +71,19 @@ const EmployeeSchema = new mongoose.Schema(
           "Password must include uppercase, lowercase, number, and special character",
       },
     },
+    role: {
+      type: String,
+      enum: ["leader", "member"],
+      default: "member",
+    },
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
+    group: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
+    fcm_token: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -82,10 +92,10 @@ const EmployeeSchema = new mongoose.Schema(
 
 // 🔐 Hash password before saving
 EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("Employee_Password")) return next();
+  if (!this.isModified("Password")) return next();
   try {
     const salt = await bcrypt.genSalt(10);
-    this.Employee_Password = await bcrypt.hash(this.Employee_Password, salt);
+    this.Password = await bcrypt.hash(this.Password, salt);
     next();
   } catch (err) {
     next(err);
@@ -94,7 +104,7 @@ EmployeeSchema.pre("save", async function (next) {
 
 // 🔑 Add method to compare password
 EmployeeSchema.methods.comparePassword = async function (plainPassword) {
-  return await bcrypt.compare(plainPassword, this.Employee_Password);
+  return await bcrypt.compare(plainPassword, this.Password);
 };
 
 const Employeemodel = mongoose.model("Employee", EmployeeSchema);

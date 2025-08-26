@@ -1,4 +1,4 @@
-import Teammodel from "../model/TeamModel";
+import Teammodel from "../model/TeamModel.js";
 
 // GET TEAM:
 const getAllTeam = async (req, res) => {

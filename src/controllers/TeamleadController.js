@@ -1,4 +1,4 @@
-import Teamleadmodel from "../model/TeamleadModel";
+import Teamleadmodel from "../model/TeamleadModel.js";
 
 
 // GET TEAMLEAD:

@@ -1,25 +1,36 @@
 import mongoose from "mongoose";
 const TeamSchema = new mongoose.Schema(
   {
-    TeamName: {
+    name: {
       type: String,
       required: true,
     },
-    TeamId: {
-      type: String,
-      required: true
-    },
-    TeamLead: {
+    id: {
       type: String,
       required: true,
     },
-    Employee_ID: {
-      type: Array
+    description: {
+      type: String,
+      required: true,
+    },
+    members: {
+      type: Array,
+    },
+    teamlead: {
+      type: String,
+      required: true,
+    },
+    employees: {
+      type: Array,
+    },
+    is_active: {
+      type: Boolean,
+      default: true,
     },
     createdAt: {
       type: Date,
-      default: Date.now
-    }
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
