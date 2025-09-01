@@ -3,31 +3,57 @@ import Teammodel from "../model/TeamModel.js";
 // GET TEAM:
 const getAllTeam = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    const total = await Teammodel.countDocuments();
-    const Team = await Teammodel.find()
-      .sort({ createdAt: -1 })
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      sortBy = "createdAt",
+      order = "desc",
+      is_active, // Optional filter
+    } = req.query;
+    const parsedLimit = parseInt(limit);
+    const parsedPage = parseInt(page);
+    const skip = (parsedPage - 1) * parsedLimit;
+    const query = {};
+    // 🔍 Multi-field Search
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { teamlead: searchRegex },
+        { id: searchRegex },
+      ];
+    }
+    // ✅ Filter by is_active (true/false)
+    if (is_active !== undefined) {
+      query.is_active = is_active === "true";
+    }
+    // 🧲 Sorting
+    const sortOrder = order === "asc" ? 1 : -1;
+    const total = await Teammodel.countDocuments(query);
+    const teams = await Teammodel.find(query)
+      .sort({ [sortBy]: sortOrder })
       .skip(skip)
-      .limit(limit);
+      .limit(parsedLimit);
     res.status(200).json({
       success: true,
-      data: Team,
+      data: teams,
       pagination: {
         total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-        hasNextPage: page * limit < total,
-        hasPrevPage: page > 1,
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit),
+        hasNextPage: parsedPage * parsedLimit < total,
+        hasPrevPage: parsedPage > 1,
       },
     });
   } catch (error) {
-    console.error("Get All Employees Error:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch employees" });
+    console.error("Get All Teams Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch teams",
+    });
   }
 };
 
