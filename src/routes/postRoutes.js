@@ -31,13 +31,6 @@ import {
   getRejectById,
   updateReject,
 } from "../controllers/RejectControllers.js";
-import {
-  createclient,
-  deleteClient,
-  getAllclient,
-  getClientById,
-  updateClient,
-} from "../controllers/ClientControllers.js";
 import { getAllnotifications } from "../controllers/NotificationControllers.js";
 import {
   addNote,
@@ -48,6 +41,7 @@ import {
   updateLeadStatus,
   updateNote,
 } from "../controllers/LeadControllers.js";
+import { createTeam, deleteTeam, getTeams, updateTeam } from "../controllers/TeamControllers.js";
 const router = express.Router();
 
 // APPLICATION :
@@ -84,13 +78,6 @@ router.get("/reject/:id", getRejectById);
 router.put("/reject/:id", updateReject);
 router.delete("/reject/:id", deleteReject);
 
-// CLIENT :
-router.get("/client", getAllclient);
-router.post("/client", createclient);
-router.get("/client/:id", getClientById);
-router.get("/client/:id", updateClient);
-router.get("/client/:id", deleteClient);
-
 // Notification :
 router.get("/notification", getAllnotifications);
 
@@ -103,5 +90,12 @@ router.delete("/lead/:leadId/notes/:noteId", deleteNote);
 router.put("/lead/:leadId/notes/:noteId", updateNote);
 router.put("/lead/:leadId", updateLeadStatus);
 
+
+// Team :
+
+router.get("/team",getTeams);
+router.post("/team",createTeam);
+router.put("/team:id",updateTeam);
+router.delete("/team:id",deleteTeam)
 
 export default router;

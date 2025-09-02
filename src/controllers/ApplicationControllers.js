@@ -3,16 +3,53 @@ import Applicationmodel from "../model/ApplicationModel.js";
 // GET APPLICATION :
 const getapplication = async (req, res) => {
   try {
-    const Application = await Applicationmodel.find();
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Sorting
+    const sortBy = req.query.sortBy || "createdAt"; // default sort field
+    const order = req.query.order === "asc" ? 1 : -1; // default desc
+
+    // Search
+    const search = req.query.search || "";
+    const filter = search
+      ? {
+          $or: [
+            { Application_Name: { $regex: search, $options: "i" } },
+            { Application_ID: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    // Count for pagination
+    const total = await Applicationmodel.countDocuments(filter);
+
+    // Fetch applications
+    const applications = await Applicationmodel.find(filter)
+      .sort({ [sortBy]: order })
+      .skip(skip)
+      .limit(limit);
+
     res.status(200).json({
-      data: Application,
       success: true,
+      data: applications,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
     });
   } catch (err) {
-    console.log(err?.message);
-    res.status(400).json({ message: err?.message, success: false });
+    console.error("Get Applications Error:", err.message);
+    res.status(400).json({ message: err.message, success: false });
   }
 };
+
 
 // CREATE APPLICATION :
 const createapplication = async (req, res) => {
@@ -23,11 +60,22 @@ const createapplication = async (req, res) => {
     Application_lunch_date,
   } = req.body;
   try {
+
+    const lastApplication = await Applicationmodel.findOne().sort({ createdAt: -1 });
+    let nextId = 1;
+    if (lastApplication && lastApplication?.Application_ID) {
+      const lastIdNum = parseInt(
+        lastApplication?.Application_ID.replace("APP", "")
+      );
+      nextId = lastIdNum + 1;
+    }
+    const Application_ID = `APP${nextId.toString().padStart(3, "0")}`;
     const Application = await Applicationmodel.create({
       Application_Name,
       Application_Description,
       Application_url,
       Application_lunch_date,
+      Application_ID
     });
     res
       .status(200)

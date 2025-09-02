@@ -11,6 +11,10 @@ const ApplicationSchema = new mongoose.Schema({
     Application_url: {
         type: String
     },
+    Application_ID:{
+        type:String,
+        required:true
+    },
     Application_lunch_date: {
         type: String
     }

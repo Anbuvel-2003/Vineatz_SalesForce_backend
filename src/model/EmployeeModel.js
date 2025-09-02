@@ -46,6 +46,23 @@ const EmployeeSchema = new mongoose.Schema(
     Client_Id: {
       type: String,
     },
+    TeamId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Team",
+      default:null
+    },
+    Teamname:{
+      type:String,
+      default:null
+    },
+    Teamleadname:{
+      type:String
+    },
+    Role :{
+      type:String,
+      enum:["employee","teamlead"],
+      default:"employee"
+    },
     Employee_Bike_Number: {
       type: String,
       required: true,
