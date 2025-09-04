@@ -65,6 +65,28 @@ const getAllEmployees = async (req, res) => {
 
 
 
+// getalltotalemployee :
+const getalltotalemployee = async (req, res) => {
+  try {
+    const employees = await Employeemodel.find();
+
+    res.status(200).json({
+      success: true,
+      data: employees,
+      total: employees.length, // optional
+    });
+  } catch (error) {
+    console.error("Get All Employees Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch employees",
+    });
+  }
+};
+
+
+
+
 // CREATE EMPLOYEE :
 const createEmployee = async (req, res) => {
   try {
@@ -275,5 +297,6 @@ export {
   getEmployeeById,
   deleteEmployee,
   updateEmployee,
+  getalltotalemployee
 };
     

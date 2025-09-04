@@ -57,12 +57,13 @@ const createTeam = async (req, res) => {
 
 
 // READ Teams with Pagination, Sorting, Filtering
- const getTeams = async (req, res) => {
+const getTeams = async (req, res) => {
   try {
     let { page = 1, limit = 10, sortBy = "createdAt", order = "desc", search = "" } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
+    // 🔍 Search filter
     const filter = search
       ? {
           $or: [
@@ -71,28 +72,34 @@ const createTeam = async (req, res) => {
           ]
         }
       : {};
+    // 📂 Get teams with population
     const teams = await Team.find(filter)
-      .populate("Teamlead_Id", "Employee_Name Employee_Email") // populate leader
-      .populate("Teammembers_ID", "Employee_Name Employee_Email") // populate members
+      .populate("Teamlead_Id", "Employee_Name Employee_Email")
+      .populate("Teammembers_ID", "Employee_Name Employee_Email")
       .sort({ [sortBy]: order === "desc" ? -1 : 1 })
       .skip(skip)
       .limit(limit);
-
+    // 📊 Total documents
     const total = await Team.countDocuments(filter);
-
+    const totalPages = Math.ceil(total / limit);
+    // ✅ Response
     res.status(200).json({
       success: true,
       data: teams,
       pagination: {
         total,
         page,
-        pages: Math.ceil(total / limit),
-      },
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // UPDATE Team
  const updateTeam = async (req, res) => {
