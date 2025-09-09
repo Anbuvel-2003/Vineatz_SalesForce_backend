@@ -6,16 +6,78 @@ import bcrypt from "bcrypt";
 
 
 // GET EMPLOYEE:
+// const getAllEmployees = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10;
+//     const skip = (page - 1) * limit;
+//     const total = await Employeemodel.countDocuments();
+//     const employees = await Employeemodel.find()
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(limit);
+//     res.status(200).json({
+//       success: true,
+//       data: employees,
+//       pagination: {
+//         total,
+//         page,
+//         limit,
+//         totalPages: Math.ceil(total / limit),
+//         hasNextPage: page * limit < total,
+//         hasPrevPage: page > 1,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Get All Employees Error:", error.message);
+//     res
+//       .status(500)
+//       .json({ success: false, message: "Failed to fetch employees" });
+//   }
+// };
+
+
 const getAllEmployees = async (req, res) => {
   try {
+    // Pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const total = await Employeemodel.countDocuments();
-    const employees = await Employeemodel.find()
-      .sort({ createdAt: -1 })
+
+    // Sorting
+    const sortBy = req.query.sortBy || "createdAt";  
+    const order = req.query.order === "asc" ? 1 : -1; 
+
+    // Filtering
+    const search = req.query.search || ""; 
+    const role = req.query.role || ""; // 👈 role filter from query
+
+    const filter = {};
+
+    // If search query is present
+    if (search) {
+      filter.$or = [
+        { Employee_Name: { $regex: search, $options: "i" } },
+        { Employee_Email: { $regex: search, $options: "i" } },
+        { Employee_Address: { $regex: search, $options: "i" } },
+        { Role: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // If role filter is present
+    if (role) {
+      filter.Role = role; // exact match (employee / teamlead)
+    }
+
+    // Count for pagination
+    const total = await Employeemodel.countDocuments(filter);
+
+    // Fetch employees
+    const employees = await Employeemodel.find(filter)
+      .sort({ [sortBy]: order })
       .skip(skip)
       .limit(limit);
+
     res.status(200).json({
       success: true,
       data: employees,
@@ -30,9 +92,7 @@ const getAllEmployees = async (req, res) => {
     });
   } catch (error) {
     console.error("Get All Employees Error:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch employees" });
+    res.status(500).json({ success: false, message: "Failed to fetch employees" });
   }
 };
 
@@ -49,7 +109,7 @@ const createEmployee = async (req, res) => {
       lead_id,
       client_id,
       Bike_Number,
-     driving_license_number,
+      driving_license_number,
       password,
     } = req.body;
     // ✅ Validate required fields
