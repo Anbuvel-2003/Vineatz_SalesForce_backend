@@ -92,10 +92,10 @@ const EmployeeSchema = new mongoose.Schema(
 
 // 🔐 Hash password before saving
 EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("Password")) return next();
+  if (!this.isModified("password")) return next();
   try {
     const salt = await bcrypt.genSalt(10);
-    this.Password = await bcrypt.hash(this.Password, salt);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (err) {
     next(err);
@@ -104,7 +104,7 @@ EmployeeSchema.pre("save", async function (next) {
 
 // 🔑 Add method to compare password
 EmployeeSchema.methods.comparePassword = async function (plainPassword) {
-  return await bcrypt.compare(plainPassword, this.Password);
+  return await bcrypt.compare(plainPassword, this.password);
 };
 
 const Employeemodel = mongoose.model("Employee", EmployeeSchema);

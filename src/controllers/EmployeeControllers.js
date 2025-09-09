@@ -2,6 +2,8 @@ import { application } from "express";
 import Employeemodel from "../model/EmployeeModel.js";
 import Welcomemail from "../emailtemplates/welcomemail.js";
 import { sendMail } from "../Utils/EmailServer/emailsend.js";
+import bcrypt from "bcrypt"; 
+
 
 // GET EMPLOYEE:
 const getAllEmployees = async (req, res) => {
@@ -38,38 +40,40 @@ const getAllEmployees = async (req, res) => {
 const createEmployee = async (req, res) => {
   try {
     const {
-      Employee_Name,
-      Employee_Email,
-      Employee_Mobilenumber,
-      Employee_Alternative_Mobilenumber,
-      Employee_Address,
-      Employee_joining_date,
-      Lead_Id,
-      Application_Id,
-      Client_Id,
-      Employee_Bike_Number,
-      Employee_Driving_License_Number,
-      Employee_Password,
+      name,
+      email,
+      mobilenumber,
+      alternative_mobilenumber,
+      address,
+      joining_date,
+      lead_id,
+      client_id,
+      Bike_Number,
+     driving_license_number,
+      password,
     } = req.body;
     // ✅ Validate required fields
     if (
-      !Employee_Name ||
-      !Employee_Email ||
-      !Employee_Mobilenumber ||
-      !Employee_Alternative_Mobilenumber ||
-      !Employee_Address ||
-      !Employee_Bike_Number ||
-      !Employee_Driving_License_Number ||
-      !Employee_Password
+      !name ||
+      !email ||
+      !mobilenumber ||
+      !alternative_mobilenumber ||
+      !address ||
+      !joining_date ||
+      !driving_license_number ||
+      !password
     ) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be filled",
       });
+     
+      
     }
+     console.log("2222222");
     // ✅ Check if email already exists
     const existingEmployee = await Employeemodel.findOne({
-      Employee_Email,
+      email,
     });
     if (existingEmployee) {
       return res.status(400).json({
@@ -80,34 +84,35 @@ const createEmployee = async (req, res) => {
     // ✅ Generate auto Employee_Id like EMP001
     const lastEmployee = await Employeemodel.findOne().sort({ createdAt: -1 });
     let nextId = 1;
-    if (lastEmployee && lastEmployee.Employee_Id) {
+    if (lastEmployee && lastEmployee.id) {
       const lastIdNum = parseInt(
-        lastEmployee.Employee_Id.replace("EMP", "")
+        lastEmployee.id.replace("EMP", "")
       );
       nextId = lastIdNum + 1;
     }
-    const Employee_Id = `EMP${nextId.toString().padStart(3, "0")}`;
+    const id = `EMP${nextId.toString().padStart(3, "0")}`;
+    console.log("id", id);
+    
     // ✅ Create and save new employee
     const newEmployee = new Employeemodel({
-      Employee_Id,
-      Employee_Name,
-      Employee_Email,
-      Employee_Mobilenumber,
-      Employee_Alternative_Mobilenumber,
-      Employee_Address,
-      Employee_joining_date,
-      Lead_Id,
-      Application_Id,
-      Client_Id,
-      Employee_Bike_Number,
-      Employee_Driving_License_Number,
-      Employee_Password,
+      id,
+      name,
+      email,
+      mobilenumber,
+      alternative_mobilenumber,
+      address,
+      joining_date,
+      lead_id,
+      client_id,
+      Bike_Number,
+      driving_license_number,
+      password,
     });
     await newEmployee.save();
     // ✅ Send welcome email with credentials
-    const subject = `👋 Welcome to Vineatz Salesforce, ${Employee_Name}!`;
-    const html = Welcomemail(Employee_Email, Employee_Password); // This sends raw password
-    const result = await sendMail({ to: Employee_Email, subject, html });
+    const subject = `👋 Welcome to Vineatz Salesforce, ${name}!`;
+    const html = Welcomemail(email, password); // This sends raw password
+    const result = await sendMail({ to: email, subject, html });
     if (!result.success) {
       console.error("Email sending failed:", result.error);
       return res.status(500).json({
@@ -147,24 +152,23 @@ const getEmployeeById = async (req, res) => {
 
 // // UPDATE  EMPLOYEE:
 const updateEmployee = async (req, res) => {
-  const { id } = req.params;
+  const { ID } = req.params;
   const {
-    Employee_Id,
-    Employee_Name,
-    Employee_Email,
-    Employee_Mobilenumber,
-    Employee_Alternative_Mobilenumber,
-    Employee_Address,
-    Employee_Bike_Number,
-    Employee_Driving_License_Number,
-    Employee_joining_date,
-    Application_Id,
-    Client_Id,
-    Lead_Id,
+   id,
+    name,
+    email,
+    mobilenumber,
+    alternative_mobilenumber,
+    address,
+    Bike_Number,
+    driving_license_number,
+    joining_date,
+    client_id,
+    lead_id,
   } = req.body;
 
   try {
-    const employee = await Employeemodel.findById(id);
+    const employee = await Employeemodel.findById(ID);
     if (!employee) {
       return res
         .status(404)
@@ -172,32 +176,31 @@ const updateEmployee = async (req, res) => {
     }
 
     // Optionally check for duplicate Employee_Id
-    if (Employee_Id && Employee_Id !== employee.Employee_Id) {
-      const duplicate = await Employeemodel.findOne({ Employee_Id });
+    if (id && id !== employee.id) {
+      const duplicate = await Employeemodel.findOne({ id });
       if (duplicate) {
         return res
           .status(400)
           .json({ success: false, message: "Employee ID already exists" });
       }
     }
-    employee.Employee_Name = Employee_Name || employee.Employee_Name;
-    employee.Employee_Email = Employee_Email || employee.Employee_Email;
-    employee.Employee_Mobilenumber =
-      Employee_Mobilenumber || employee.Employee_Mobilenumber;
-    employee.Employee_Alternative_Mobilenumber =
-      Employee_Alternative_Mobilenumber ||
-      employee.Employee_Alternative_Mobilenumber;
-    employee.Employee_Address = Employee_Address || employee.Employee_Address;
-    employee.Employee_Bike_Number =
-      Employee_Bike_Number || employee.Employee_Bike_Number;
-    employee.Employee_Driving_License_Number =
-      Employee_Driving_License_Number ||
-      employee.Employee_Driving_License_Number;
-    employee.Employee_joining_date =
-      Employee_joining_date || employee.Employee_joining_date;
-    employee.Lead_Id = Lead_Id || employee.Lead_Id;
-    employee.Application_Id = Application_Id || employee.Application_Id;
-    employee.Client_Id = Client_Id || employee.Client_Id;
+    employee.name = name || employee.name;
+    employee.email = email || employee.email;
+    employee.mobilenumber =
+      mobilenumber || employee.mobilenumber;
+    employee.alternative_mobilenumber =
+      alternative_mobilenumber ||
+      employee.alternative_mobilenumber;
+    employee.address = address || employee.address;
+    employee.Bike_Number =
+      Bike_Number || employee.Bike_Number;
+    employee.driving_license_number =
+      driving_license_number ||
+      employee.driving_license_number;
+    employee.joining_date =
+      joining_date || employee.joining_date;
+    employee.lead_id = lead_id || employee.lead_id;
+    employee.client_id = client_id || employee.client_id;
     await employee.save();
 
     res.status(200).json({
@@ -236,9 +239,51 @@ const deleteEmployee = async (req, res) => {
       .json({ success: false, message: "Error deleting employee" });
   }
 };
+ 
+const LoginEmployee = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const userdata = await Employeemodel.findOne({ email: email });
+    if (!userdata) {
+      return res
+        .status(404)
+        .json({ message: "Employee not found", success: false });
+    }
+    const isMatch = await bcrypt.compare(password, userdata.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Incorrect password", success: false });
+    }
+    res.status(200).json({
+      message: "Login successful",
+      data: {
+        id: userdata._id,
+        name: userdata.name,
+        email: userdata.email,
+        employeeId: userdata.id,
+        mobilenumber: userdata.mobilenumber,
+        alternative_mobilenumber: userdata.alternative_mobilenumber,
+        address: userdata.address,
+        Bike_Number: userdata.Bike_Number,
+        driving_license_number: userdata.driving_license_number,
+        joining_date: userdata.joining_date,
+        lead_id: userdata.lead_id,
+        client_id: userdata.client_id
+      },
+      success: true,
+    });
+  } catch (err) {
+    console.error("Login error:", err.message);
+    res.status(500).json({ message: err.message, success: false });
+  }
+};
+
+
 
 export {
   getAllEmployees,
+  LoginEmployee,
   createEmployee,
   getEmployeeById,
   deleteEmployee,

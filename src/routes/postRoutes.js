@@ -11,6 +11,7 @@ import {
   deleteEmployee,
   getAllEmployees,
   getEmployeeById,
+  LoginEmployee,
   updateEmployee,
 } from "../controllers/EmployeeControllers.js";
 import {
@@ -64,6 +65,7 @@ router.delete("/application/:id", deleteapplication);
 // EMPLOYEE :
 router.get("/employee", getAllEmployees);
 router.post("/employee", createEmployee);
+router.post("/employeelogin", LoginEmployee);
 router.get("/employee/:id", getEmployeeById);
 router.put("/employee/:id", updateEmployee);
 router.delete("/employee/:id", deleteEmployee);
