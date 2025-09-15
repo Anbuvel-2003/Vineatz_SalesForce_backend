@@ -9,6 +9,9 @@ import {
 import {
   createEmployee,
   deleteEmployee,
+  employeeChangepassword,
+  employeeSendOtp,
+  employeeverifyOtp,
   getAllEmployees,
   getEmployeeById,
   LoginEmployee,
@@ -69,6 +72,9 @@ router.post("/employeelogin", LoginEmployee);
 router.get("/employee/:id", getEmployeeById);
 router.put("/employee/:id", updateEmployee);
 router.delete("/employee/:id", deleteEmployee);
+router.post("/employee/sendotp", employeeSendOtp);
+router.post("/employee/verifyotp", employeeverifyOtp);
+router.post("/employee/changepassword", employeeChangepassword);
 
 // LEADS :
 

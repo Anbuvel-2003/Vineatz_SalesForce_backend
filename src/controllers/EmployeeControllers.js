@@ -3,6 +3,9 @@ import Employeemodel from "../model/EmployeeModel.js";
 import Welcomemail from "../emailtemplates/welcomemail.js";
 import { sendMail } from "../Utils/EmailServer/emailsend.js";
 import bcrypt from "bcrypt"; 
+import EmailSendOtp from "../emailtemplates/emailsendotp.js";
+import { createToken, verifyToken } from "../config/jwtConfig.js";
+const otpStore = new Map();
 
 
 // GET EMPLOYEE:
@@ -339,6 +342,86 @@ const LoginEmployee = async (req, res) => {
   }
 };
 
+const employeeSendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    // ✅ Check if email exists in the Users collection
+    const existingUser = await Employeemodel.findOne({ email: email });
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ message: "Email not found", success: false });
+    }
+    // ✅ Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const token = await createToken(email, otp);
+    console.log("Generated Token:", token);
+    console.log("OTP:", otp);
+    const html = EmailSendOtp(email, otp);
+    const subject = "🔐 Your OTP to Change Password - Vineatz Salesforce";  
+    const result = await sendMail({ to: email, subject, html });
+    result.success
+      ? console.log("Email sent successfully")
+      : console.error("Failed to send email:", result.error);
+    otpStore.set(email, { otp, expiresAt: Date.now() + 5 * 60 * 1000 });
+    return res.status(200).json({
+      message: "OTP sent successfully",
+      token,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error in send-otp:", error);
+    return res
+      .status(500)
+      .json({ message: "OTP sending failed", success: false });
+  }
+};
+const employeeverifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const data = await verifyToken(req.headers.authorization.split(" ")[1]);
+    console.log(data);
+    if (data !== otp) {
+      return res.status(400).json({ message: "Invalid OTP", success: false });
+    }
+    return res
+      .status(200)
+      .json({ message: "OTP verified successfully", success: true });
+  } catch (error) {
+    console.error("Error in verify-otp:", error);
+    return res
+      .status(500)
+      .json({ message: "OTP verification failed", success: false });
+  }
+};
+const employeeChangepassword = async (req, res) => {
+  try {
+    const { newpassword, email } = req.body;
+
+    const user = await Employeemodel.findOne({ email: email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+    const hashedPassword = await bcrypt.hash(newpassword, 10);
+
+    await Employeemodel.updateOne({ email: email }, { password: hashedPassword });
+
+    return res
+      .status(200)
+      .json({ message: "Password changed successfully", success: true });
+  } catch (error) {
+    console.error("Error in change-password:", error.message);
+    return res 
+      .status(500)
+      .json({ message: "Password change failed", success: false });
+  }
+};
+
 
 
 export {
@@ -348,5 +431,8 @@ export {
   getEmployeeById,
   deleteEmployee,
   updateEmployee,
+  employeeSendOtp,
+  employeeverifyOtp,
+  employeeChangepassword
 };
     
