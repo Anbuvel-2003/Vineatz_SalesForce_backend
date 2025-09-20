@@ -114,7 +114,7 @@ router.get("/teamlead/:id", updateTeamlead);
 router.get("/team", getAllTeam);
 router.post("/team", createTeam);
 router.get("/team/:id", getTeamById);
-router.get("/team/:id", deleteTeam);
+router.delete("/team/:id", deleteTeam);
 router.get("/team/:id", updateTeam);
 
 // Notification :

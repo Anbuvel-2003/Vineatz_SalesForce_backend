@@ -22,21 +22,38 @@ const createapplication = async (req, res) => {
     Application_url,
     Application_lunch_date,
   } = req.body;
+
   try {
+    // 1. Find last created Application based on createdAt
+    const lastApplication = await Applicationmodel?.findOne()?.sort({ createdAt: -1 });
+
+    // 2. Generate next Application ID
+    let nextId = 1;
+    if (lastApplication && lastApplication?.Application_ID) {
+      const lastIdNum = parseInt(lastApplication?.Application_ID.replace("APP", ""));
+      nextId = lastIdNum + 1;
+    }
+
+    const Application_ID = `APP${nextId.toString().padStart(3, "0")}`;
     const Application = await Applicationmodel.create({
+      Application_ID,
       Application_Name,
       Application_Description,
       Application_url,
       Application_lunch_date,
     });
-    res
-      .status(200)
-      .json({ message: "Application Created Sucessfully !!!!", success: true });
+
+    res.status(200).json({
+      message: "Application Created Successfully !!!!",
+      success: true,
+      Application_ID,
+    });
   } catch (err) {
     console.log(err?.message);
     res.status(400).json({ message: err?.message, success: false });
   }
 };
+
 
 // GET SINGLE APPLICATION :
 const getsingleapplication = async (req, res) => {

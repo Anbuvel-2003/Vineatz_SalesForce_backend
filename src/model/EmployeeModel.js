@@ -80,6 +80,18 @@ const EmployeeSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    TeamId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Team",
+      default:null
+    },
+    Teamname:{
+      type:String,
+      default:null
+    },
+    Teamleadname:{
+      type:String
+    },
     group: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
     fcm_token: {
       type: String,

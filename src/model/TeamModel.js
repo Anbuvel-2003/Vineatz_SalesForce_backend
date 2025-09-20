@@ -5,24 +5,39 @@ const TeamSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    id: {
+    Team_Id: {
       type: String,
+      unique: true
+    },
+    id: {
       required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
     },
     description: {
       type: String,
       required: true,
     },
-    members: {
-      type: Array,
+    members: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Employee",
+
+      }
+    ],
+    Completedlead: {
+      type: Number,
+      default: 0,
+    },
+    rejectedlead: {
+      type: Number,
+      default: 0,
     },
     teamlead: {
       type: String,
       required: true,
     },
-    employees: {
-      type: Array,
-    },
+
     is_active: {
       type: Boolean,
       default: true,

@@ -130,8 +130,6 @@ const createEmployee = async (req, res) => {
         success: false,
         message: "All required fields must be filled",
       });
-     
-      
     }
      console.log("2222222");
     // ✅ Check if email already exists
@@ -321,7 +319,7 @@ const LoginEmployee = async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       data: {
-        id: userdata._id,
+        _id: userdata._id,
         name: userdata.name,
         email: userdata.email,
         employeeId: userdata.id,

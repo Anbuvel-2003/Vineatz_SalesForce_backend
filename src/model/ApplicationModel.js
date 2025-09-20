@@ -13,7 +13,12 @@ const ApplicationSchema = new mongoose.Schema({
     },
     Application_lunch_date: {
         type: String
-    }
+    },
+    Application_ID: {
+        type: String,
+        unique: true,
+    },
+    
 }, {
     timestamps: true,
 });
